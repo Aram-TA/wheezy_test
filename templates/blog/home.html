@@ -1,0 +1,91 @@
+@require(path_for, page, user_session, items_on_page, total_pages)
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Home</title>
+		<link rel="stylesheet"
+			href="@path_for('static', path='css/home.css')" />
+		<link rel="stylesheet"
+			href="@path_for('static', path='css/read_post.css')" />
+		<script src="@path_for('static', path='js/read_post.js')"></script>
+	</head>
+
+	<body>
+		<div id="readPost">
+
+		</div>
+		<header>
+			<nav>
+				<h1>Some random forum</h1>
+				@if page > 1:
+					<a href="/home?page=@str(page - 1)">Previous Page</a>
+				@endif
+					<span>@str(page)</span>
+				@if page < total_pages:
+					<a href="/home?page=@str(page + 1)">Next Page</a>
+				@endif
+
+				@if user_session:
+					<div class="nav_div">
+						<p><span>@user_session['username']</span></p>
+						<p><a href="/logout">Log Out</a></p>
+					</div>
+				@else:
+					<div class="nav_div">
+						<p><a href="/register">Register</a></p>
+						<p><a class="link" href="/login">Log In</a></p>
+					</div>
+				@endif
+			</nav>
+		</header>
+
+		<main>
+			<section class="posts_header">
+				<h3 id="ph1" class="ph_g_fi">All messages</h3>
+				<h3 id="ph2" class="ph_g_fi">Top Topics</h3>
+				@if user_session:
+					<a id="ph3" class="ph_g_fi" href="/create_post">New Message</a>
+				@endif
+				<p id="ph4" class="ph_g_fi"><a href="/search">Search</a></p>
+			</section>
+
+			@for post in items_on_page:
+			<article class="content_list">
+				<div class="info">
+					<p style="margin: 0;">
+						Message by
+						<span class="underlined">@post['author_username']</span>
+						on @post['created']
+					</p>
+
+					@if user_session:
+
+						@if user_session['user_id'] == str(post['author_id']):
+							<a class="action"
+								href="/update_post/@str(post['id'])">Edit</a>
+						@endif
+
+					@endif
+
+					@if post['body']:
+						<a class="action reading"
+							href="/read_post/@str(post['id'])">
+						Read Post</a>
+					@endif
+				</div>
+
+				<div id="post_body">
+					<div id="title">@post['title']</div>
+
+					@if post['body']:
+						<p class="post_message">@post['body']</p>
+					@endif
+				</div>
+			</article>
+			@endfor
+		</main>
+	</body>
+</html>

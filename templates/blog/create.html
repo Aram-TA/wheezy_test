@@ -1,0 +1,50 @@
+@require(path_for, error)
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>New Post</title>
+		<link
+			rel="stylesheet"
+			href="@path_for('static', path='css/create.css')"
+		/>
+	</head>
+
+	<body>
+		<main>
+			<header>
+				<nav><a href="@path_for('home')">Go back</a></nav>
+				<h1>New post</h1>
+			</header>
+
+			@if error:
+			<p id="error">@error</p>
+			@endif
+
+			<form id="form1" method="post">
+				<label class="tocenter" for="title">Title</label>
+				<input
+					name="title"
+					class="textfield"
+					placeholder="Enter your title"
+					maxlength="150"
+					required
+				/>
+				<label class="tocenter" for="body">Text</label>
+				<textarea
+					name="body"
+					class="textfield"
+					placeholder="Share your thoughts..."></textarea>
+				<input
+					style="margin-bottom: 2em"
+					class="textfield"
+					type="submit"
+					value="Save"
+				/>
+			</form>
+		</main>
+	</body>
+
+</html>

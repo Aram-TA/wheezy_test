@@ -1,0 +1,99 @@
+body {
+  margin-bottom: 0;
+  margin-top: 0;
+  margin-right: 15%;
+  margin-left: 15%;
+  border-left: solid 2px;
+  border-right: solid 2px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+p {
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+figure {
+  margin: 0;
+  margin-left: 1%;
+  margin-right: 1%;
+  border-bottom: 2px;
+}
+figcaption {
+  margin-top: 2%;
+  font-weight: bold;
+  margin-left: 1%;
+  overflow-wrap: break-word;
+}
+nav {
+  margin-bottom: 1%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+nav h1 {
+  margin-left: 2rem;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.nav_div {
+  margin-right: 2rem;
+}
+.underlined {
+  text-decoration: underline solid 1px black;
+  font-style: italic;
+}
+.posts_header {
+  display: grid;
+  grid-template-columns: 12% 68% 10% 10%;
+  align-items: center;
+  border-bottom: solid 2px;
+  border-top: solid 2px;
+  overflow-wrap: break-word;
+}
+#ph1{
+  padding-left: 5%;
+}
+.ph_g_fi {
+  margin: 0;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+.content_list {
+  height: fit-content;
+  margin-bottom: 1.25em;
+  margin-top: 1.25em;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: 80% 10% 10%;
+  grid-auto-rows: auto;
+  grid-auto-flow: column;
+  margin-left: 1%;
+  margin-bottom: 0.5%;
+}
+.post_message {
+  margin: 0;
+  padding: 0.3em;
+  height: 3em;
+  border: solid 1px;
+  border-radius: 0.6em;
+  overflow: hidden;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+#post_body{
+
+  min-height: 70%;
+}
+#title{
+  margin-bottom: 0.25%;
+  padding-left: 2%;
+  padding-right: 1%;
+  font-weight: bold;
+  word-wrap: break-word;
+  word-break: break-all;
+}
