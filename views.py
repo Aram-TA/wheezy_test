@@ -109,7 +109,7 @@ class HomeHandler(BaseHandler):
 
         # TODO put here 404
         if page > total_pages:
-            return self.redirect_for("home", page=1)
+            return self.render_response("404.html")
 
         return self.render_response(
             "home.html",

@@ -52,7 +52,7 @@ def define_session(principal):
 
 
 def define_current_page(query):
-    if page := (query.get("page", ["1"])[0]).isdigit():
+    if (page := query.get("page", ["1"])[0]).isdigit():
         return int(page)
     return 1
 
