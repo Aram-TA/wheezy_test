@@ -1,19 +1,93 @@
 from wheezy.web import authorize
 from wheezy.web.handlers import BaseHandler
-# from flask import (
-#     url_for,
-#     request,
-#     Response,
-#     redirect,
-#     Blueprint,
-#     render_template,
-# )
+from wheezy.security import Principal
 
-from searcher import Searcher
-# from auth import login_required
-from notes import NotesController
+from controllers import (
+    define_session,
+    define_current_page,
+    Searcher,
+    NotesController,
+    Users,
+    init_pages
+)
 
-# bp = Blueprint("blog", __name__)
+
+class RegisterHandler(BaseHandler):
+    def get(self):
+        """ Renders register template
+
+        Returns
+        -------
+        Response
+
+        """
+        return self.render_response("register.html", error=None)
+
+    def post(self):
+        """ Does some validation for registration
+        then if it succeed redirects to login
+
+        Returns
+        -------
+        Response
+
+        """
+        users = Users()
+
+        if error := users.validate_registration(self.request.form):
+            return self.render_response("register.html", error=error)
+
+        users.reg_new_acc(self.request.form)
+
+        return self.redirect_for("login")
+
+
+class LoginHandler(BaseHandler):
+    def get(self):
+        """ Renders login template
+
+        Returns
+        -------
+        Response
+
+        """
+        return self.render_response("login.html", error=None)
+
+    def post(self):
+        """ Does some validation for login then if it succeed redirects
+        to index page. Also handles current session of logged in user
+
+        Returns
+        -------
+        Response
+
+        """
+        users = Users()
+
+        if error := users.validate_login(self.request.form):
+            return self.render_response("login.html", error=error)
+
+        user_id, username = users.take_login_info(
+            self.request.form["email"][0]
+        )
+        self.principal = Principal(id=str(user_id), alias=username)
+
+        return self.redirect_for("home")
+
+
+class LogOutHandler(BaseHandler):
+    @authorize()
+    def get(self):
+        """ Clears all data of current flask
+        session and redirects to index page
+
+        Returns
+        -------
+        Response
+
+        """
+        del self.principal
+        return self.redirect_for("home")
 
 
 class IndexHandler(BaseHandler):
@@ -30,33 +104,19 @@ class HomeHandler(BaseHandler):
         Response
 
         """
-        if self.request.query:
-            page = self.request.query.get("page", ["1"])[0]
-            page = "1" if not page.isdigit() else page
-        else:
-            page = "1"
+        page: int = define_current_page(self.request.query)
+        items_on_page, total_pages = init_pages(page)
 
-        page = int(page)
-
-        items_on_page: list
-        total_pages: int
-        if self.principal:
-            user_id, username = self.principal.id.split(",")
-            user_session = {"user_id": user_id, "username": username}
-        else:
-            user_session = None
-
-        items_on_page, total_pages = NotesController().init_pages(page)
-
-        if page > total_pages or page < 1:
+        # TODO put here 404
+        if page > total_pages:
             return self.redirect_for("home", page=1)
 
         return self.render_response(
-            "blog/home.html",
+            "home.html",
             items_on_page=items_on_page,
             total_pages=total_pages,
             page=page,
-            user_session=user_session
+            user_session=define_session(self.principal)
         )
 
 
@@ -69,7 +129,7 @@ class SearchHandler(BaseHandler):
         Response
 
         """
-        return self.render_response("blog/search.html", search_result=None)
+        return self.render_response("search.html", search_result=None)
 
     def post(self):
         """ Searches necessary data in posts database, renders what it found
@@ -83,7 +143,7 @@ class SearchHandler(BaseHandler):
         search_result = Searcher().search_by_title_or_body(keyword)
 
         return self.render_response(
-            "blog/search.html",
+            "search.html",
             search_result=search_result
         )
 
@@ -102,7 +162,6 @@ class ReadPostHandler(BaseHandler):
 
         """
         post_id: str = str(self.route_args.get("post_id"))
-        current_post: dict | None
 
         if not (
             current_post := NotesController().validate_post(post_id)
@@ -110,7 +169,7 @@ class ReadPostHandler(BaseHandler):
             return self.redirect_for("home")
 
         return self.render_response(
-            "blog/read-post.html",
+            "read-post.html",
             post=current_post,
         )
 
@@ -125,7 +184,7 @@ class CreatePostHandler(BaseHandler):
         Response
 
         """
-        return self.render_response("blog/create.html", error=None)
+        return self.render_response("create.html", error=None)
 
     @authorize()
     def post(self):
@@ -137,21 +196,16 @@ class CreatePostHandler(BaseHandler):
         Response
 
         """
-        title: str | None
-
-        user_id, username = self.principal.id.split(",")
-        user_session = {"user_id": user_id, "username": username}
-
         if not (title := self.request.form["title"][0]):
             return self.render_response(
-                "blog/create.html",
+                "create.html",
                 error="Title is required"
             )
 
         NotesController().create_post(
             title,
             self.request.form["body"][0],
-            user_session
+            define_session(self.principal)
         )
 
         return self.redirect_for("home")
@@ -173,50 +227,43 @@ class UpdatePostHandler(BaseHandler):
         Response
 
         """
-        post_id: str = str(self.route_args.get("post_id"))
-
-        user_id, username = self.principal.id.split(",")
-        user_session = {"user_id": user_id, "username": username}
-
         if not (
             current_post := NotesController().validate_post(
-                post_id, user_session
+                str(self.route_args.get("post_id")),
+                define_session(self.principal)
             )
         ):
             return self.redirect_for("home")
 
         return self.render_response(
-            "blog/update.html",
+            "update.html",
             current_post=current_post,
             error=None
         )
 
     @authorize
     def post(self):
-        post_id: str = str(self.route_args.get("post_id"))
         notes_controller = NotesController()
 
-        title: str = self.request.form["title"][0]
-        current_post: dict | None
+        post_id: str = str(self.route_args.get("post_id"))
 
-        user_id, username = self.principal.id.split(",")
-        user_session = {"user_id": user_id, "username": username}
-
-        if current_post := notes_controller.validate_post(
-            post_id, user_session
+        if (
+            current_post := notes_controller.validate_post(
+                post_id,
+                define_session(self.principal)
+                )
+        ) and (
+            error := notes_controller.update_post(
+                post_id,
+                self.request.form["title"][0],
+                self.request.form["body"][0]
+            )
         ):
-            if (
-                error := notes_controller.update_post(
-                    post_id,
-                    title,
-                    self.request.form["body"][0]
-                )
-            ):
-                return self.render_response(
-                    "blog/update.html",
-                    current_post=current_post,
-                    error=error
-                )
+            return self.render_response(
+                "update.html",
+                current_post=current_post,
+                error=error
+            )
 
         return self.redirect_for("home")
 
@@ -235,14 +282,13 @@ class DeletePostHandler(BaseHandler):
         Response
 
         """
-        user_id, username = self.principal.id.split(",")
-        user_session = {"user_id": user_id, "username": username}
-
         post_id: str = str(self.route_args.get("post_id"))
         notes_controller = NotesController()
 
-        if notes_controller.validate_post(post_id, user_session):
+        if notes_controller.validate_post(
+            post_id,
+            define_session(self.principal)
+        ):
             notes_controller.delete_post(post_id)
-        print("we are here inside delete handler")
 
         return self.redirect_for("home")

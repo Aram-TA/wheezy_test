@@ -51,40 +51,39 @@
 				@endif
 				<p id="ph4" class="ph_g_fi"><a href="/search">Search</a></p>
 			</section>
-
 			@for post in items_on_page:
-			<article class="content_list">
-				<div class="info">
-					<p style="margin: 0;">
-						Message by
-						<span class="underlined">@post['author_username']</span>
-						on @post['created']
-					</p>
+				<article class="content_list">
+					<div class="info">
+						<p style="margin: 0;">
+							Message by
+							<span class="underlined">@post['creator']</span>
+							on @post['created']
+						</p>
 
-					@if user_session:
+						@if user_session:
 
-						@if user_session['user_id'] == str(post['author_id']):
-							<a class="action"
-								href="/update_post/@str(post['id'])">Edit</a>
+							@if user_session['user_id'] == str(post['author_id']):
+								<a class="action"
+									href="/update_post/@str(post['id'])">Edit</a>
+							@endif
+
 						@endif
 
-					@endif
+						@if post['body']:
+							<a class="action reading"
+								href="/read_post/@str(post['id'])">
+							Read Post</a>
+						@endif
+					</div>
 
-					@if post['body']:
-						<a class="action reading"
-							href="/read_post/@str(post['id'])">
-						Read Post</a>
-					@endif
-				</div>
+					<div id="post_body">
+						<div id="title">@post['title']</div>
 
-				<div id="post_body">
-					<div id="title">@post['title']</div>
-
-					@if post['body']:
-						<p class="post_message">@post['body']</p>
-					@endif
-				</div>
-			</article>
+						@if post['body']:
+							<p class="post_message">@post['body']</p>
+						@endif
+					</div>
+				</article>
 			@endfor
 		</main>
 	</body>

@@ -11,7 +11,7 @@ from wheezy.web.middleware import (
 )
 
 from urls import all_urls
-from dataBase import init_users_table, init_notes_table
+from data_base import init_users_table, init_notes_table
 
 
 def construct_app():

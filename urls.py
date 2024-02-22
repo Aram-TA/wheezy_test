@@ -8,7 +8,7 @@ from wheezy.http.cache import etag_md5crc32
 from wheezy.http import response_cache, CacheProfile
 from wheezy.http.transforms import gzip_transform, response_transforms
 
-from blog import (
+from views import (
     HomeHandler,
     IndexHandler,
     SearchHandler,
@@ -16,9 +16,6 @@ from blog import (
     CreatePostHandler,
     UpdatePostHandler,
     DeletePostHandler,
-)
-
-from auth import (
     RegisterHandler,
     LoginHandler,
     LogOutHandler
@@ -35,8 +32,8 @@ static_cache_profile = CacheProfile(
 )
 
 static_files = response_cache(static_cache_profile)(
-    response_transforms(
-        gzip_transform(compress_level=6))(file_handler(root="static/"))
+    response_transforms(gzip_transform(compress_level=6))
+    (file_handler(root="static/"))
 )
 
 all_urls = [

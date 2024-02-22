@@ -1,14 +1,209 @@
 import re
+from datetime import datetime
 from string import ascii_lowercase, ascii_uppercase, digits
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from data_base import db
 
-from dataBase import db
+
+def init_pages(page: int) -> tuple[list, int]:
+    """ Defines pages count, content, current page for application
+
+    Parameters
+    ----------
+    page : int
+
+    Returns
+    -------
+    tuple[list, int]
+
+    """
+    cursor = db.cursor()
+
+    limit: int = 10
+    offset: int = (page - 1) * limit
+
+    items_on_page: list = cursor.execute(
+        '''
+        SELECT notes.id, notes.author_id, notes.title, notes.body,
+        notes.created, users.username as creator
+        FROM notes INNER JOIN users ON notes.author_id = users.id
+        LIMIT ? OFFSET ?
+        ''',
+        (limit, offset)
+    ).fetchall()
+
+    posts_count: int = len(
+        [post for post in cursor.execute('SELECT id FROM notes')]
+    )
+    total_pages = (posts_count + limit - 1) // limit if posts_count else 1
+
+    cursor.close()
+    return items_on_page, total_pages
+
+
+def define_session(principal):
+    if principal and (usr_id := principal.id):
+        return {
+            "user_id": usr_id,
+            "username": principal.alias
+        }
+
+
+def define_current_page(query):
+    if page := (query.get("page", ["1"])[0]).isdigit():
+        return int(page)
+    return 1
+
+
+class Searcher:
+    def search_by_title_or_body(self, keyword: str):
+        cursor = db.cursor()
+
+        search_result = cursor.execute(
+            'SELECT * FROM notes WHERE title LIKE ?1 OR body LIKE ?1',
+            (f"%{keyword}%",)
+        ).fetchall()
+
+        cursor.close()
+        return enumerate(search_result, start=1)
+
+
+class NotesController:
+    """
+    Class that validates, creates, deletes, and updates notes/posts
+    """
+    __slots__ = ()
+
+    def validate_post(
+        self,
+        post_id: str,
+        user_session: None | dict = None
+    ) -> dict | None:
+        """ Validates post id for usage. Returns current post if id is valid
+
+        Parameters
+        ----------
+        post_id : str
+        read_mode : bool
+
+        Returns
+        -------
+        dict | None
+
+        """
+        cursor = db.cursor()
+
+        current_post: dict = cursor.execute(
+            'SELECT * FROM notes WHERE id = ?',
+            (post_id,)
+        ).fetchone()
+
+        cursor.close()
+
+        if not current_post:
+            return
+
+        if user_session:
+            if str(current_post["author_id"]) != user_session["user_id"]:
+                return
+
+        return current_post
+
+    def delete_post(self, post_id: str) -> None | str:
+        """ Deletes post by id form database
+
+        Parameters
+        ----------
+        post_id : str
+
+        """
+        cursor = db.cursor()
+
+        cursor.execute('DELETE FROM notes WHERE id = ?', (post_id,))
+
+        cursor.close()
+        db.commit()
+
+    def update_post(
+        self,
+        post_id: str,
+        title: str,
+        body: str
+    ) -> None | str:
+        """ Updates post by id
+
+        Parameters
+        ----------
+        post_id : str
+        title : str
+        body : str
+
+        """
+        if not title:
+            return "Title is required."
+
+        cursor = db.cursor()
+
+        cursor.execute(
+            'UPDATE notes SET title = ?, body= ? WHERE id = ?',
+            (title, body, post_id)
+        )
+
+        cursor.close()
+        db.commit()
+
+    def create_post(
+        self,
+        title: str,
+        body: str,
+        user_session: dict
+    ) -> None:
+        """ Creates new post, assigns id to it by using
+
+        Parameters
+        ----------
+        title : str
+        body : str
+
+        """
+        cursor = db.cursor()
+
+        cursor.execute(
+            '''INSERT INTO notes (
+                title,
+                body,
+                created,
+                author_id
+            )
+            VALUES (?, ?, ?, ?)''',
+            (
+                title,
+                body,
+                datetime.now().strftime("%Y-%m-%d %H:%M"),
+                user_session['user_id']
+            )
+        )
+
+        cursor.close()
+        db.commit()
 
 
 class Users:
     __slots__ = ()
+
+    def take_login_info(self, email: str):
+        cursor = db.cursor()
+
+        cursor.execute(
+            'SELECT id, username FROM users WHERE email = ?',
+            (email,)
+        )
+        info = cursor.fetchone()
+        cursor.close()
+
+        return info
 
     def reg_new_acc(self, request_form: dict) -> None:
         """ Registers new account data to database
