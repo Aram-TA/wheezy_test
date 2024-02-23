@@ -1,3 +1,14 @@
+"""Summary
+
+Attributes
+----------
+all_urls : list
+    List of urls with their handlers for wsgi app
+static_cache_profile : CacheProfile
+    Wheezy.http CacheProfile object, defines caching headers for http
+static_files : Any
+    Static files for out application
+"""
 from datetime import timedelta
 
 from wheezy.routing import url

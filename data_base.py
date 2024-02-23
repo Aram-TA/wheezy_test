@@ -1,3 +1,6 @@
+""" Creates connection with database for our wsgi application, handles table
+    creating processes for our db.
+"""
 import sqlite3
 
 from config import DATA_BASE_PATH
@@ -8,6 +11,8 @@ db.row_factory = sqlite3.Row
 
 
 def init_users_table():
+    """Creates users table inside db
+    """
     cursor = db.cursor()
     cursor.execute(
         '''
@@ -25,6 +30,8 @@ def init_users_table():
 
 
 def init_notes_table():
+    """Creates notes table inside db
+    """
     cursor = db.cursor()
     cursor.execute(
         '''

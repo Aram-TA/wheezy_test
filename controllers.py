@@ -1,68 +1,135 @@
+""" All controllers that application use during it's work
+"""
 import re
 from datetime import datetime
 from string import ascii_lowercase, ascii_uppercase, digits
 
+from wheezy.core.collections import first_item_adapter
+from wheezy.http import HTTPResponse
+from wheezy.security import Principal
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from data_base import db
 
 
-def init_pages(page: int) -> tuple[list, int]:
-    """ Defines pages count, content, current page for application
+class ErrorsController:
+    @staticmethod    
+    def render_http_error(
+        status_code: int,
+        options: dict,
+        helpers: dict
+    ) -> HTTPResponse:
+        """Summary
+        
+        Parameters
+        ----------
+        status_code : int
+            Status code of error that will be rendered.
+        options : dict
+            Default options dict from wheezy.http WSGIApplication
+        helpers : dict
+            Default dict of helpers from wheezy.web BaseHandler
+        
+        Returns
+        -------
+        HTTPResponse
+            
+        """
+        assert status_code >= 400 and status_code <= 505
 
-    Parameters
-    ----------
-    page : int
+        response = HTTPResponse()
+        response.status_code = status_code
 
-    Returns
-    -------
-    tuple[list, int]
-
-    """
-    cursor = db.cursor()
-
-    limit: int = 10
-    offset: int = (page - 1) * limit
-
-    items_on_page: list = cursor.execute(
-        '''
-        SELECT notes.id, notes.author_id, notes.title, notes.body,
-        notes.created, users.username as creator
-        FROM notes INNER JOIN users ON notes.author_id = users.id
-        LIMIT ? OFFSET ?
-        ''',
-        (limit, offset)
-    ).fetchall()
-
-    posts_count: int = len(
-        [post for post in cursor.execute('SELECT id FROM notes')]
-    )
-    total_pages = (posts_count + limit - 1) // limit if posts_count else 1
-
-    cursor.close()
-    return items_on_page, total_pages
-
-
-def define_session(principal):
-    if principal and (usr_id := principal.id):
-        return {
-            "user_id": usr_id,
-            "username": principal.alias
-        }
+        response.write(
+            options["render_template"](
+                f"errors/{status_code}.html", dict(helpers))
+        )
+        return response
 
 
-def define_current_page(query):
-    if (page := query.get("page", ["1"])[0]).isdigit():
-        return int(page)
-    return 1
+class PageController:
+    @staticmethod
+    def init_pages(page: int) -> tuple[list, int]:
+        """Summary
+        
+        Parameters
+        ----------
+        page : int
+            Current page for user
+        
+        Returns
+        -------
+        tuple[list, int]
+            items_on_page, total_pages
+
+        """
+        cursor = db.cursor()
+
+        limit: int = 10
+        offset: int = (page - 1) * limit
+
+        items_on_page: list = cursor.execute(
+            '''
+            SELECT notes.id, notes.author_id, notes.title, notes.body,
+            notes.created, users.username as creator
+            FROM notes INNER JOIN users ON notes.author_id = users.id
+            WHERE deleted = 0
+            LIMIT ? OFFSET ?
+            ''',
+            (limit, offset)
+        ).fetchall()
+
+        posts_count: int = len(
+            [post for post in cursor.execute('SELECT id FROM notes')]
+        )
+        total_pages = (posts_count + limit - 1) // limit if posts_count else 1
+
+        cursor.close()
+        return items_on_page, total_pages
+
+    @staticmethod
+    def define_current_page(query: str) -> int: 
+        """ Validation for query string inside url. If it fails it returns 0
+        
+        Parameters
+        ----------
+        query : str
+            Query string from user request
+        
+        Returns
+        -------
+        int
+
+        """
+        if (page := query.get("page", ["1"])[0]).isdigit():
+            return int(page)
+        return 0
 
 
 class Searcher:
-    def search_by_title_or_body(self, keyword: str):
+    @staticmethod
+    def search_by_title_or_body(keyword: str) -> enumerate:
+        """ Searches inside notes table from database, takes everything by
+            keyword, returns it as enumerated list
+        
+        Parameters
+        ----------
+        keyword : str
+            keyword from user input
+        
+        Returns
+        -------
+        enumerate
+            enumerated list of search result
+
+        """
         cursor = db.cursor()
 
         search_result = cursor.execute(
-            'SELECT * FROM notes WHERE title LIKE ?1 OR body LIKE ?1',
+            '''
+            SELECT * FROM notes WHERE (title LIKE ?1 OR body LIKE ?1)
+            AND deleted = 0
+            ''',
             (f"%{keyword}%",)
         ).fetchall()
 
@@ -71,26 +138,19 @@ class Searcher:
 
 
 class NotesController:
-    """
-    Class that validates, creates, deletes, and updates notes/posts
-    """
     __slots__ = ()
 
+    @staticmethod
     def validate_post(
-        self,
         post_id: str,
         user_session: None | dict = None
     ) -> dict | None:
-        """ Validates post id for usage. Returns current post if id is valid
-
+        """ Validates post by id. If everything is ok returns it's data.
+        
         Parameters
         ----------
         post_id : str
-        read_mode : bool
-
-        Returns
-        -------
-        dict | None
+        user_session : None | dict, optional
 
         """
         cursor = db.cursor()
@@ -105,40 +165,43 @@ class NotesController:
         if not current_post:
             return
 
-        if user_session:
-            if str(current_post["author_id"]) != user_session["user_id"]:
-                return
+        if user_session and str(
+                current_post["author_id"]) != user_session["user_id"]:
+            return
 
         return current_post
 
-    def delete_post(self, post_id: str) -> None | str:
-        """ Deletes post by id form database
-
+    @staticmethod
+    def delete_post(post_id: str):
+        """ Deletes post from database
+        
         Parameters
         ----------
         post_id : str
-
+            
         """
         cursor = db.cursor()
 
-        cursor.execute('DELETE FROM notes WHERE id = ?', (post_id,))
+        cursor.execute('UPDATE notes SET deleted = 1 WHERE id = ?', (post_id,))
 
         cursor.close()
         db.commit()
 
+    @staticmethod
     def update_post(
-        self,
         post_id: str,
         title: str,
         body: str
-    ) -> None | str:
-        """ Updates post by id
-
+    ):
+        """ Updates post by it's id and new data.
+        
         Parameters
         ----------
         post_id : str
         title : str
+            Title for updated version of post
         body : str
+            Body for updated version of post
 
         """
         if not title:
@@ -154,22 +217,25 @@ class NotesController:
         cursor.close()
         db.commit()
 
+    @staticmethod
     def create_post(
-        self,
         title: str,
-        body: str,
-        user_session: dict
+        user_session: dict,
+        body: str = ""
     ) -> None:
-        """ Creates new post, assigns id to it by using
-
+        """ Creates new post then writes it to database
+        
         Parameters
         ----------
         title : str
+            title for new post
+        user_session : dict
+            Current user data from session
         body : str
+            body for new post
 
         """
         cursor = db.cursor()
-
         cursor.execute(
             '''INSERT INTO notes (
                 title,
@@ -182,7 +248,7 @@ class NotesController:
                 title,
                 body,
                 datetime.now().strftime("%Y-%m-%d %H:%M"),
-                user_session['user_id']
+                int(user_session['user_id'])
             )
         )
 
@@ -193,7 +259,40 @@ class NotesController:
 class Users:
     __slots__ = ()
 
-    def take_login_info(self, email: str):
+    @staticmethod
+    def define_session(principal: Principal) -> dict:
+        """Summary
+        
+        Parameters
+        ----------
+        principal : Principal
+            Container for user sensitive session information
+        
+        Returns
+        -------
+        TYPE
+            Description
+        """
+        if principal and (usr_id := principal.id):
+            return {
+                "user_id": usr_id,
+                "username": principal.alias
+            }
+
+    @staticmethod
+    def take_login_info(email: str) -> tuple:
+        """ Takes user info from database by email, returns it as tuple
+        
+        Parameters
+        ----------
+        email : str
+            Email of user
+        
+        Returns
+        -------
+        tuple
+
+        """
         cursor = db.cursor()
 
         cursor.execute(
@@ -205,44 +304,48 @@ class Users:
 
         return info
 
-    def reg_new_acc(self, request_form: dict) -> None:
-        """ Registers new account data to database
-
+    @staticmethod
+    def reg_new_acc(request_form: dict) -> None:
+        """ Writes new account data into database.
+        
         Parameters
         ----------
         request_form : dict
-
+            Description
         """
+        adapted_form = first_item_adapter(request_form)
         cursor = db.cursor()
         cursor.execute(
             '''INSERT INTO users (email, phone_number, username, password)
             VALUES (?, ?, ?, ?)''',
             (
-                request_form["email"][0],
-                request_form["phone_number"][0],
-                request_form["username"][0],
-                generate_password_hash(request_form["password"][0])
+                adapted_form["email"],
+                adapted_form["phone_number"],
+                adapted_form["username"],
+                generate_password_hash(adapted_form["password"])
             )
         )
         cursor.close()
         db.commit()
 
-    def validate_login(self, request_form: dict) -> str | None:
-        """ Validates user login by using existing password and email.
-        Also gives back user data for use to routing function
-
+    @staticmethod
+    def validate_login(request_form: dict) -> str | None:
+        """ Validates user login by using request_form
+        
         Parameters
         ----------
         request_form : dict
-
+            Form from user input inside client
+        
         Returns
         -------
         str | None
 
         """
         error: str | None = None
+        adapted_form = first_item_adapter(request_form)
 
-        email: str = request_form["email"][0]
+        email: str = adapted_form["email"]
         text: str = "User with that email not found or Incorrect password"
 
         cursor = db.cursor()
@@ -261,32 +364,33 @@ class Users:
 
             if not check_password_hash(
                 password_hash,
-                request_form["password"][0]
+                adapted_form["password"]
             ):
                 error = text
 
         cursor.close()
         return error
 
-    def validate_registration(self, request_form: dict) -> None | str:
-        """ Validates registration by using some functions above
-            If we have some errors in validation we will receive error
-
+    @classmethod
+    def validate_registration(cls, request_form: dict) -> str | None:
+        """ Validates user registration by using request_form
+        
         Parameters
         ----------
         request_form : dict
-
+            Form from user input inside client
+        
         Returns
         -------
-        None | str
+        str | None
+            Error from validation
 
         """
-        # Sqlite cursor doesn't support `with` context manager :(
         cursor = db.cursor()
-
+        adapted_form = first_item_adapter(request_form)
         if cursor.execute(
             'SELECT id FROM users WHERE email = ? or phone_number = ?',
-            (request_form["email"][0], request_form["phone_number"][0])
+            (adapted_form["email"], adapted_form["phone_number"])
         ).fetchone():
 
             cursor.close()  # So I have to close it manually
@@ -294,28 +398,29 @@ class Users:
 
         cursor.close()
 
-        if request_form['password'][0] != request_form['password_repeat'][0]:
+        if adapted_form['password'] != adapted_form['password_repeat']:
             return "Passwords in both fields should be same."
 
         for input_type in ("email", "phone_number", "username", "password"):
 
             error: str | None
-            if error := getattr(self, f"validate_{input_type}")(
-                request_form[input_type][0]
+            if error := getattr(cls, f"validate_{input_type}")(
+                adapted_form[input_type]
             ):
                 return error
 
-    def validate_phone_number(self, phone_number: str) -> None | str:
-        """ Validates phone number
-
+    @staticmethod
+    def validate_phone_number(phone_number: str) -> str | None:
+        """ Validates phone number by using str.translate
+        
         Parameters
-        -----------
+        ----------
         phone_number : str
-
+        
         Returns
         -------
         str | None
-
+            
         """
         if not phone_number:
             return "Phone number can't be empty."
@@ -334,13 +439,14 @@ class Users:
             return """Phone number should be longer that 6 characters
                     and less than 37.""".strip()
 
-    def validate_username(self, username: str) -> None | str:
-        """ Validates username
-
+    @staticmethod
+    def validate_username(username: str) -> str | None:
+        """Validates username
+        
         Parameters
-        -----------
+        ----------
         username : str
-
+        
         Returns
         -------
         str | None
@@ -361,14 +467,14 @@ class Users:
                 Please use latin letters and only underscore, hyphen,
                 period are allowed from special characters.""".strip()
 
-    def validate_password(self, password: str) -> None | str:
-        """ Validates password.
-            Function makes sure that password format is right
-
+    @staticmethod
+    def validate_password(password: str) -> str | None:
+        """ Validates user password format
+        
         Parameters
-        -----------
+        ----------
         password : str
-
+        
         Returns
         -------
         str | None
@@ -391,16 +497,17 @@ class Users:
         if len(password) < 8:
             return "Password min length should be 8 characters."
 
-    def validate_email(self, email: str) -> None | str:
-        """ Validates email by using regex.
-
+    @staticmethod
+    def validate_email(email: str) -> str | None:
+        """ Validates user email by using regex
+        
         Parameters
         ----------
         email : str
-
+        
         Returns
         -------
-        None | str
+        str | None
 
         """
         if not re.match(

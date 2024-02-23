@@ -1,52 +1,49 @@
 @require(path_for, error)
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Log in</title>
-    <link
-      rel="stylesheet"
-      href="@path_for('static', path='css/login.css')"
-    />
-  </head>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Log in</title>
+	<link rel="stylesheet" href="@path_for('static', path='css/login.css')!h" />
+</head>
 
-  <body>
-    <main>
-      @if error:
-      <p id="error">@error</p>
-      @endif
-      <header>
-        <nav class="nav_container">
-          <a href="@path_for('home')">Home</a>
-        </nav>
-        <h1>Login</h1>
-      </header>
-      <form method="post" class="reg_form">
-        <label class="ToCenter" for="email">Email</label>
-        <input
-          type="email"
-          class="Input"
-          name="email"
-          maxlength="36"
-          id="email"
-          required
-        />
-        <label class="ToCenter" for="password">Password</label>
-        <input
-          class="Input"
-          type="password"
-          name="password"
-          id="password"
-          maxlength="32"
-          required
-        />
-        <input class="Button Input" type="submit" value="Log in" />
-        <p class="ToCenter">Don&apos;t have an account?</p>
-        <p class="ToCenter">
-          <a href="/register">Register</a>
-        </p>
-      </form>
-    </main>
-  </body>
+<body>
+	<main>
+		@if error:
+			<p id="error">@error!h</p>
+		@endif
+		<header>
+			<nav class="nav_container">
+				<a href="@path_for('home')!h">Home</a>
+			</nav>
+			<h1>Login</h1>
+		</header>
+		<form method="post" class="reg_form">
+			<label class="ToCenter" for="email">Email</label>
+			<input
+			type="email"
+			class="Input"
+			name="email"
+			maxlength="36"
+			id="email"
+			required
+			/>
+			<label class="ToCenter" for="password">Password</label>
+			<input
+			class="Input"
+			type="password"
+			name="password"
+			id="password"
+			maxlength="32"
+			required
+			/>
+			<input class="Button Input" type="submit" value="Log in" />
+			<p class="ToCenter">Don&apos;t have an account?</p>
+			<p class="ToCenter">
+			<a href="/register">Register</a>
+			</p>
+		</form>
+	</main>
+</body>
 </html>

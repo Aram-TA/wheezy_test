@@ -1,22 +1,20 @@
 @require(path_for, current_post, error)
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Edit:&nbsp;@current_post['title']</title>
-	<link rel="stylesheet"
-		href="@path_for('static', path='css/update.css')">
+	<link rel="stylesheet" href="@path_for('static', path='css/update.css')!h" />
 </head>
 
 <body>
 	<main>
 		<header>
 			<nav>
-				<a href="@path_for('home')">Go back</a>
+				<a href="@path_for('home')!h">Go back</a>
 			</nav>
-			<h1>@current_post['title']</h1>
+			<h1>@current_post['title']!h</h1>
 		</header>
 
 		@if error:
@@ -27,28 +25,30 @@
 			<form id="form1" method="post">
 				<label class="tocenter" for="title">Title</label>
 				<input
-					type="text"
-					name="title"
-					class="textfield"
-					value="@current_post['title']"
-					maxlength="150"
-					required
+				type="text"
+				name="title"
+				class="textfield"
+				value="@current_post['title']!h"
+				maxlength="150"
+				required
 				/>
 				<label class="tocenter" for="body">Text</label>
 				<textarea name="body" class="textfield">@current_post['body']</textarea>
-				<input class="button textfield" type="submit" value="Save">
-			</form>
-			<form action="/delete_post/@str(current_post['id'])"
-				method="post" id="form2">
+				<input class="button textfield" type="submit" value="Save" />
+				</form>
+			<form
+			action="/delete_post/@str(current_post['id'])!h"
+			method="post"
+			id="form2"
+			>
 				<input
-					class="button textfield"
-					type="submit"
-					value="Delete"
-					onclick="return confirm('Are you sure?');"
+				class="button textfield"
+				type="submit"
+				value="Delete"
+				onclick="return confirm('Are you sure?');"
 				/>
 			</form>
 		</div>
 	</main>
 </body>
-
 </html>
