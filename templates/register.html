@@ -6,8 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Register</title>
 	<link
-	rel="stylesheet"
-	href="@path_for('static', path='css/register.css')"
+		rel="stylesheet"
+		href="@path_for('static', path='css/register.css')"
 	/>
 </head>
 
@@ -28,44 +28,44 @@
 			<label class="ToCenter" for="phone_number">Phone number</label>
 			<input
 			type="tel"
-			maxlength="36"
-			name="phone_number"
-			id="phone_number"
-			pattern="^[0-9_ \-\+]{6,36}$"
-			required
+				maxlength="36"
+				name="phone_number"
+				id="phone_number"
+				pattern="^[0-9_ \-\+]{6,36}$"
+				required
 			/>
 			<label class="ToCenter" for="username">Username</label>
 			<input
-			type="text"
-			name="username"
-			maxlength="16"
-			pattern="^[a-zA-Z0-9_\-\.]{2,36}$"
-			id="username"
-			required
+				type="text"
+				name="username"
+				maxlength="16"
+				pattern="^[a-zA-Z0-9_\-\.]{2,36}$"
+				id="username"
+				required
 			/>
 			<label class="ToCenter" for="password">Password</label>
 			<input
-			maxlength="32"
-			minlength="8"
-			type="password"
-			name="password"
-			id="password"
-			pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9_\+\-]+[a-zA-Z0-9_\+\-\s]*$"
-			required
+				maxlength="32"
+				minlength="8"
+				type="password"
+				name="password"
+				id="password"
+				pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9_\+\-]+[a-zA-Z0-9_\+\-\s]*$"
+				required
 			/>
 			<label class="ToCenter" for="password_repeat">Repeat password</label>
 			<input
-			maxlength="32"
-			minlength="8"
-			type="password"
-			name="password_repeat"
-			id="password_repeat"
-			required
+				maxlength="32"
+				minlength="8"
+				type="password"
+				name="password_repeat"
+				id="password_repeat"
+				required
 			/>
 			<input id="button" type="submit" value="Register" />
 			<p class="ToCenter">Already have an account?</p>
 			<p class="ToCenter"><a href="/login">Log In</a></p>
 		</form>
-		</main>
-	</body>
+	</main>
+</body>
 </html>

@@ -7,8 +7,8 @@
 	<title>Home</title>
 	<link rel="stylesheet" href="@path_for('static', path='css/home.css')!h" />
 	<link
-	rel="stylesheet"
-	href="@path_for('static', path='css/read_post.css')!h"
+		rel="stylesheet"
+		href="@path_for('static', path='css/read_post.css')!h"
 	/>
 	<script src="@path_for('static', path='js/read_post.js')!h"></script>
 </head>
@@ -32,8 +32,8 @@
 				<div class="nav_div">
 					<p><span>@user_session['username']!h</span></p>
 					<p><a href="/logout">Log Out</a></p>
-					</div>
-					@else:
+				</div>
+			@else:
 				<div class="nav_div">
 					<p><a href="/register">Register</a></p>
 					<p><a class="link" href="/login">Log In</a></p>
@@ -57,23 +57,25 @@
 			<article class="content_list">
 				<div class="info">
 					<p style="margin: 0">
-					Message by
+						Message by
 					<span class="underlined">@post['creator']!h</span>
-					on @post['created']!h
+						on @post['created']!h
 					</p>
 
 					@if user_session:
 
 						@if user_session['user_id'] == str(post['author_id']):
 							<a class="action" href="/update_post/@str(post['id'])!h">
-							Edit</a>
+								Edit
+							</a>
 						@endif
 					
 					@endif 
 
 					@if post['body']:
 						<a class="action reading" href="/read_post/@str(post['id'])!h">
-						Read Post</a>
+							Read Post
+						</a>
 					@endif
 				</div>
 
@@ -85,7 +87,7 @@
 					@endif
 
 				</div>
-		</article>
+			</article>
 		@endfor
 	</main>
 </body>

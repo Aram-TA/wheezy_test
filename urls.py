@@ -9,32 +9,33 @@ static_cache_profile : CacheProfile
 static_files : Any
     Static files for out application
 """
-from datetime import timedelta
 
 from wheezy.routing import url
-
-from wheezy.web.handlers import file_handler
-
 from wheezy.http.cache import etag_md5crc32
+from wheezy.web.handlers import file_handler
 from wheezy.http import response_cache, CacheProfile
 from wheezy.http.transforms import gzip_transform, response_transforms
 
-from views import (
-    HomeHandler,
-    IndexHandler,
-    SearchHandler,
-    ReadPostHandler,
-    CreatePostHandler,
-    UpdatePostHandler,
-    DeletePostHandler,
+from views.authentication_handlers import (
     RegisterHandler,
     LoginHandler,
     LogOutHandler
 )
+from views.home_page_handlers import (
+    IndexHandler,
+    HomeHandler,
+    SearchHandler
+)
+from views.posts_handlers import (
+    CreatePostHandler,
+    UpdatePostHandler,
+    DeletePostHandler,
+    ReadPostHandler
+)
 
 static_cache_profile = CacheProfile(
     "public",
-    duration=timedelta(minutes=15),
+    duration=900,
     vary_environ=["HTTP_ACCEPT_ENCODING"],
     namespace="static",
     http_vary=["Accept-Encoding"],

@@ -7,29 +7,28 @@
 	<title>Search Post</title>
 	<link rel="stylesheet" href="@path_for('static', path='css/search.css')" />
 	<link
-	rel="stylesheet"
-	href="@path_for('static', path='css/read_post.css')"
+		rel="stylesheet"
+		href="@path_for('static', path='css/read_post.css')"
 	/>
 	<script src="@path_for('static', path='js/read_post.js')"></script>
 </head>
 
 <body>
 	<div id="readPost"></div>
-
 	<div id="content">
 		<header>
 			<h1>Search</h1>
 			<nav>
-			<a href="@path_for('home')!h">Go Home</a>
+				<a href="@path_for('home')!h">Go Home</a>
 			</nav>
 		</header>
 		<main>
 			<form id="main_form" method="post">
 				<input
-				id="sch_input"
-				name="search_keyword"
-				maxlength="150"
-				type="text"
+					id="sch_input"
+					name="search_keyword"
+					maxlength="150"
+					type="text"
 				/>
 				<input type="submit" value="Search" />
 			</form>
@@ -38,12 +37,13 @@
 				<div id="result">
 				@for index, (post) in search_result:
 					<div id="title">
-					<p style="flex-basis: 70%">@str(index):&nbsp@post['title']!h</p>
+						<p style="flex-basis: 70%">@str(index):&nbsp@post['title']!h</p>
 
-					@if post['body']:
-						<a class="reading" href="/read_post/@str(post['id'])">
-						ReadPost </a>
-					@endif
+						@if post['body']:
+							<a class="reading" href="/read_post/@str(post['id'])">
+								ReadPost
+							</a>
+						@endif
 					</div>
 				@endfor
 				</div>

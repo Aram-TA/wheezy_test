@@ -25,27 +25,27 @@
 			<form id="form1" method="post">
 				<label class="tocenter" for="title">Title</label>
 				<input
-				type="text"
-				name="title"
-				class="textfield"
-				value="@current_post['title']!h"
-				maxlength="150"
-				required
+					type="text"
+					name="title"
+					class="textfield"
+					value="@current_post['title']!h"
+					maxlength="150"
+					required
 				/>
 				<label class="tocenter" for="body">Text</label>
 				<textarea name="body" class="textfield">@current_post['body']</textarea>
 				<input class="button textfield" type="submit" value="Save" />
-				</form>
+			</form>
 			<form
-			action="/delete_post/@str(current_post['id'])!h"
-			method="post"
-			id="form2"
+				action="/delete_post/@str(current_post['id'])!h"
+				method="post"
+				id="form2"
 			>
 				<input
-				class="button textfield"
-				type="submit"
-				value="Delete"
-				onclick="return confirm('Are you sure?');"
+					class="button textfield"
+					type="submit"
+					value="Delete"
+					onclick="return confirm('Are you sure?');"
 				/>
 			</form>
 		</div>
