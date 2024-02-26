@@ -18,7 +18,7 @@ from data_base import init_users_table, init_notes_table
 
 def construct_app():
     """ Constructs wsgi application for our server with it's full configuration
-    
+
     Returns
     -------
     TYPE

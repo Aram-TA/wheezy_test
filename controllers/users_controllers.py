@@ -10,12 +10,12 @@ from data_base import db, CursorContextManager
 
 def define_session(principal: Principal) -> dict | None:
     """Summary
-    
+
     Parameters
     ----------
     principal : Principal
         Container for user sensitive session information
-    
+
     Returns
     -------
     TYPE
@@ -30,12 +30,12 @@ def define_session(principal: Principal) -> dict | None:
 
 def take_login_info(email: str) -> tuple:
     """ Takes user info from database by email, returns it as tuple
-    
+
     Parameters
     ----------
     email : str
         Email of user
-    
+
     Returns
     -------
     tuple
@@ -53,7 +53,7 @@ def take_login_info(email: str) -> tuple:
 
 def reg_new_acc(request_form: dict) -> None:
     """ Writes new account data into database.
-    
+
     Parameters
     ----------
     request_form : dict
@@ -77,12 +77,12 @@ def reg_new_acc(request_form: dict) -> None:
 
 def validate_login(request_form: dict) -> str | None:
     """ Validates user login by using request_form
-    
+
     Parameters
     ----------
     request_form : dict
         Form from user input inside client
-    
+
     Returns
     -------
     str | None
@@ -111,12 +111,12 @@ def validate_login(request_form: dict) -> str | None:
 
 def validate_registration(request_form: dict) -> str | None:
     """ Validates user registration by using request_form
-    
+
     Parameters
     ----------
     request_form : dict
         Form from user input inside client
-    
+
     Returns
     -------
     str | None
@@ -149,15 +149,15 @@ def validate_registration(request_form: dict) -> str | None:
 
 def validate_phone_number(phone_number: str) -> str | None:
     """ Validates phone number by using str.translate
-    
+
     Parameters
     ----------
     phone_number : str
-    
+
     Returns
     -------
     str | None
-        
+
     """
     if not phone_number:
         return "Phone number can't be empty."
@@ -179,11 +179,11 @@ def validate_phone_number(phone_number: str) -> str | None:
 
 def validate_username(username: str) -> str | None:
     """Validates username
-    
+
     Parameters
     ----------
     username : str
-    
+
     Returns
     -------
     str | None
@@ -207,11 +207,11 @@ def validate_username(username: str) -> str | None:
 
 def validate_password(password: str) -> str | None:
     """ Validates user password format
-    
+
     Parameters
     ----------
     password : str
-    
+
     Returns
     -------
     str | None
@@ -237,11 +237,11 @@ def validate_password(password: str) -> str | None:
 
 def validate_email(email: str) -> str | None:
     """ Validates user email by using regex
-    
+
     Parameters
     ----------
     email : str
-    
+
     Returns
     -------
     str | None
