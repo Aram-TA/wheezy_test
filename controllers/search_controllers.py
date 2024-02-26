@@ -4,12 +4,12 @@ from data_base import db, CursorContextManager
 def search_by_title_or_body(keyword: str) -> enumerate:
     """ Searches inside notes table from database, takes everything by
         keyword, returns it as enumerated list
-    
+
     Parameters
     ----------
     keyword : str
         keyword from user input
-    
+
     Returns
     -------
     enumerate

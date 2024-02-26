@@ -14,7 +14,7 @@ from controllers.users_controllers import (
 class RegisterHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Renders register html
-        
+
         Returns
         -------
         HTTPResponse
@@ -26,7 +26,7 @@ class RegisterHandler(BaseHandler):
     def post(self) -> HTTPResponse:
         """ Validates registration form, if everything is ok registers new
             user to database. Then redirects to login page.
-        
+
         Returns
         -------
         HTTPResponse
@@ -42,10 +42,10 @@ class RegisterHandler(BaseHandler):
         return self.redirect_for("login")
 
 
-class LoginHandler(BaseHandler):    
+class LoginHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Renders login html
-        
+
         Returns
         -------
         HTTPResponse
@@ -56,7 +56,7 @@ class LoginHandler(BaseHandler):
 
     def post(self) -> HTTPResponse:
         """ Validates login form, if everything is ok redirects to home page.
-        
+
         Returns
         -------
         HTTPResponse
@@ -81,7 +81,7 @@ class LogOutHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Deletes principal object, which is authentication cookie
             inside browser
-        
+
         Returns
         -------
         HTTPResponse

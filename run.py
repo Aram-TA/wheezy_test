@@ -16,13 +16,13 @@ from urls import all_urls
 from data_base import init_users_table, init_notes_table
 
 
-def construct_app():
+def construct_app() -> WSGIApplication:
     """ Constructs wsgi application for our server with it's full configuration
 
     Returns
     -------
-    TYPE
-        Description
+    WSGIApplication
+
     """
     engine = Engine(
         loader=FileLoader(["templates"]),

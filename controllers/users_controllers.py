@@ -9,7 +9,7 @@ from data_base import db, CursorContextManager
 
 
 def define_session(principal: Principal) -> dict | None:
-    """Summary
+    """ Returns dict of current connection session by using principal
 
     Parameters
     ----------
@@ -18,8 +18,8 @@ def define_session(principal: Principal) -> dict | None:
 
     Returns
     -------
-    TYPE
-        Description
+    dict
+
     """
     if principal and (usr_id := principal.id):
         return {
@@ -57,7 +57,7 @@ def reg_new_acc(request_form: dict) -> None:
     Parameters
     ----------
     request_form : dict
-        Description
+
     """
     adapted_form = first_item_adapter(request_form)
 

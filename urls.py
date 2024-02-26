@@ -1,4 +1,4 @@
-"""Summary
+""" Urls for wsgi app
 
 Attributes
 ----------

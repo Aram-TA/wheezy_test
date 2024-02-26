@@ -8,7 +8,7 @@ def validate_post(
     user_session: None | dict = None
 ) -> dict | None:
     """ Validates post by id. If everything is ok returns it's data.
-    
+
     Parameters
     ----------
     post_id : str
@@ -34,11 +34,11 @@ def validate_post(
 
 def delete_post(post_id: str):
     """ Deletes post from database
-    
+
     Parameters
     ----------
     post_id : str
-        
+
     """
     with CursorContextManager(db) as cursor:
         cursor.execute('UPDATE notes SET deleted = 1 WHERE id = ?', (post_id,))
@@ -52,7 +52,7 @@ def update_post(
     body: str
 ):
     """ Updates post by it's id and new data.
-    
+
     Parameters
     ----------
     post_id : str
@@ -80,7 +80,7 @@ def create_post(
     body: str = ""
 ) -> None:
     """ Creates new post then writes it to database
-    
+
     Parameters
     ----------
     title : str

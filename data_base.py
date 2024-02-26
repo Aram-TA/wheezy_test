@@ -11,6 +11,8 @@ db.row_factory = sqlite3.Row
 
 
 class CursorContextManager:
+    """Context manager for sqlite3 cursor
+    """
     def __init__(self, connection):
         self.connection = connection
 

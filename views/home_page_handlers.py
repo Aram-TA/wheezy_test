@@ -9,8 +9,8 @@ from controllers.pages_controllers import define_current_page, init_pages
 
 class IndexHandler(BaseHandler):
     def get(self) -> HTTPResponse:
-        """ Basically redirects to home page from index 
-        
+        """ Basically redirects to home page from index
+
         Returns
         -------
         HTTPResponse
@@ -23,7 +23,7 @@ class IndexHandler(BaseHandler):
 class HomeHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Handles pagination, renders home page
-        
+
         Returns
         -------
         HTTPResponse
@@ -53,7 +53,7 @@ class HomeHandler(BaseHandler):
 class SearchHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Renders search page
-        
+
         Returns
         -------
         HTTPResponse
@@ -65,7 +65,7 @@ class SearchHandler(BaseHandler):
     def post(self) -> HTTPResponse:
         """ Searches inside database post with keyword
             Renders response with founded resources.
-        
+
         Returns
         -------
         HTTPResponse

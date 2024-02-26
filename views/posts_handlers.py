@@ -16,7 +16,7 @@ class ReadPostHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Gives back html for read-post dialogue.
             Supposed to be used with XHR.
-        
+
         Returns
         -------
         HTTPResponse
@@ -40,7 +40,7 @@ class CreatePostHandler(BaseHandler):
     @authorize
     def get(self) -> HTTPResponse:
         """ Renders creating page
-        
+
         Returns
         -------
         HTTPResponse
@@ -53,8 +53,8 @@ class CreatePostHandler(BaseHandler):
     def post(self) -> HTTPResponse:
         """ Validates info from user, if everything is ok
             redirects to home page. Shows error inside create page
-            if validation isn't passed. 
-        
+            if validation isn't passed.
+
         Returns
         -------
         HTTPResponse
@@ -82,7 +82,7 @@ class UpdatePostHandler(BaseHandler):
     def get(self) -> HTTPResponse:
         """ Renders post updating and deleting page after
         post id and user validation.
-        
+
         Returns
         -------
         HTTPResponse
@@ -107,8 +107,8 @@ class UpdatePostHandler(BaseHandler):
     def post(self) -> HTTPResponse:
         """ Validates post id and form that user passed. If everything is ok
             Updates post then returns to home page. Shows error inside
-            update page if validation isn't passed. 
-        
+            update page if validation isn't passed.
+
         Returns
         -------
         HTTPResponse
@@ -144,7 +144,7 @@ class DeletePostHandler(BaseHandler):
     def post(self) -> HTTPResponse:
         """ Validates post id and user if everything is ok deletes post
             Then redirects to home page.
-        
+
         Returns
         -------
         HTTPResponse

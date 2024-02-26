@@ -6,8 +6,8 @@ def render_http_error(
     options: dict,
     helpers: dict
 ) -> HTTPResponse:
-    """Summary
-    
+    """ Renders http error page from templates by given status code
+
     Parameters
     ----------
     status_code : int
@@ -16,11 +16,11 @@ def render_http_error(
         Default options dict from wheezy.http WSGIApplication
     helpers : dict
         Default dict of helpers from wheezy.web BaseHandler
-    
+
     Returns
     -------
     HTTPResponse
-        
+
     """
     assert status_code >= 400 and status_code <= 505
 

@@ -53,6 +53,8 @@ def define_current_page(query: dict) -> int:
     int
 
     """
-    if (page := query.get("page", ["1"])[0]).isdigit():
-        return int(page)
-    return 0
+    try:
+        page = int(query.get("page", ["1"])[0])
+        return page if page < 10000 else 0
+    except ValueError:
+        return 0
